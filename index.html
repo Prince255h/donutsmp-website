@@ -33,6 +33,7 @@
             width: 100%;
             border-collapse: collapse;
             text-align: left;
+            table-layout: fixed; /* Ensures columns respect set widths */
         }
 
         .market-table th {
@@ -47,7 +48,14 @@
             padding: 1.2rem 1.5rem;
             color: #b0b3b8;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            word-wrap: break-word;
         }
+
+        /* Give specific widths to each column so they spread out properly */
+        .market-table th:nth-child(1), .market-table td:nth-child(1) { width: 40%; }
+        .market-table th:nth-child(2), .market-table td:nth-child(2) { width: 20%; }
+        .market-table th:nth-child(3), .market-table td:nth-child(3) { width: 20%; }
+        .market-table th:nth-child(4), .market-table td:nth-child(4) { width: 20%; text-align: right; }
 
         .market-table tr:hover td {
             background: rgba(0, 210, 255, 0.02);
@@ -65,6 +73,7 @@
         .item-icon {
             width: 32px;
             height: 32px;
+            min-width: 32px;
             background: rgba(0, 210, 255, 0.1);
             border: 1px solid rgba(0, 210, 255, 0.3);
             border-radius: 6px;
@@ -90,21 +99,6 @@
             color: #0a0b0e;
             box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
         }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            background-color: #0a0b0e;
-            color: #ffffff;
-            overflow-x: hidden;
-            scroll-behavior: smooth;
-        }
-
         /* Navbar Styling */
         .navbar {
             position: fixed;
@@ -1026,16 +1020,14 @@
                 `;
             }
         }
-// Fetch Live Auction House (/ah) and Market Prices
-        async function fetchMarketPrices() {
+async function fetchMarketPrices() {
             const marketBody = document.getElementById('marketBody');
             
             try {
-                // Replace with your server's live market/AH API endpoint
                 const response = await fetch('http://play.donutsmp.net:8804/api/v1/auctionhouse');
                 const items = await response.json();
                 
-                marketBody.innerHTML = ''; // Clear loading state
+                marketBody.innerHTML = ''; 
 
                 items.forEach((item) => {
                     const row = `
@@ -1048,7 +1040,7 @@
                             </td>
                             <td>${item.seller}</td>
                             <td style="color: #00d2ff; font-weight: 600;">$${Number(item.price).toLocaleString()}</td>
-                            <td>
+                            <td style="text-align: right;">
                                 <button class="buy-action-btn" onclick="alert('In-game item listed by ${item.seller}. Join play.donutsmp.net and type /ah to buy!')">View /ah</button>
                             </td>
                         </tr>
@@ -1056,19 +1048,18 @@
                     marketBody.innerHTML += row;
                 });
             } catch (error) {
-                console.error("Failed to load live market prices:", error);
-                // Fallback demo data so the table looks active even if the live backend is offline
+                // Fallback demo data so the table looks great immediately
                 marketBody.innerHTML = `
                     <tr>
                         <td>
                             <div class="item-info">
                                 <div class="item-icon">💎</div>
-                               <span>Netherite Helmet (Prot IV)</span>
+                                <span>Netherite Helmet (Prot IV)</span>
                             </div>
                         </td>
                         <td>ShadowKing99</td>
                         <td style="color: #00d2ff; font-weight: 600;">$2,500,000</td>
-                        <td><button class="buy-action-btn" onclick="alert('Join play.donutsmp.net to buy!')">View /ah</button></td>
+                        <td style="text-align: right;"><button class="buy-action-btn" onclick="alert('Join play.donutsmp.net to buy!')">View /ah</button></td>
                     </tr>
                     <tr>
                         <td>
@@ -1079,19 +1070,11 @@
                         </td>
                         <td>VortexPvP</td>
                         <td style="color: #00d2ff; font-weight: 600;">$850,000</td>
-                        <td><button class="buy-action-btn" onclick="alert('Join play.donutsmp.net to buy!')">View /ah</button></td>
+                        <td style="text-align: right;"><button class="buy-action-btn" onclick="alert('Join play.donutsmp.net to buy!')">View /ah</button></td>
                     </tr>
                 `;
             }
         }
-
-        // Call it when the window loads along with your other functions
-        window.addEventListener('DOMContentLoaded', () => {
-            updateNavAuthUI();
-            fetchLeaderboard();
-            fetchMarketPrices();
-        });
-        
     </script>
 </body>
 </html>
