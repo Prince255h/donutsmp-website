@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DonutSMP - Leaderboard</title>
+    <title>DonutSMP - Survival Server</title>
     <!-- Include EmailJS SDK -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -25,6 +25,7 @@
             background-color: #0a0b0e;
             color: #ffffff;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
         /* Navbar Styling */
@@ -140,7 +141,7 @@
             transition: 0.3s;
         }
 
-        /* Hero Section with Local Framed Gallery */
+        /* Hero Section */
         .hero {
             min-height: 100vh;
             display: flex;
@@ -238,7 +239,7 @@
             box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
         }
 
-        /* Nicely Framed Gallery Grid using local files */
+        /* Gallery Grid */
         .hero-gallery {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -372,10 +373,6 @@
             padding: 1.2rem 1.5rem;
             color: #b0b3b8;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .leaderboard-table tr:last-child td {
-            border-bottom: none;
         }
 
         .leaderboard-table tr:hover td {
@@ -600,13 +597,13 @@
                 </ul>
 
                 <div class="nav-actions" id="navActions">
-                    <!-- Dynamically controlled by JS -->
+                    <!-- Controlled by JS -->
                 </div>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section with Local Framed Gallery -->
+    <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-container">
             <div class="hero-content">
@@ -619,22 +616,22 @@
                 </div>
             </div>
 
-            <!-- Nicely Framed Gallery using local files (1.jpg, 2.jpg, etc.) -->
+            <!-- Gallery Grid -->
             <div class="hero-gallery">
                 <div class="frame-card">
-                    <img src="1.jpg" alt="Custom Survival">
+                    <img src="https://images.unsplash.com/photo-1627856013091-fed6e4e304ca?auto=format&fit=crop&w=600&q=80" alt="Custom Survival">
                     <div class="frame-title">Custom Survival</div>
                 </div>
                 <div class="frame-card">
-                    <img src="2.jpg" alt="PvP Battles">
+                    <img src="https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?auto=format&fit=crop&w=600&q=80" alt="PvP Battles">
                     <div class="frame-title">Intense PvP Arena</div>
                 </div>
                 <div class="frame-card">
-                    <img src="3.jpg" alt="Economy & Ranks">
+                    <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80" alt="Economy & Ranks">
                     <div class="frame-title">Player Economy</div>
                 </div>
                 <div class="frame-card">
-                    <img src="4.jpg" alt="Community Events">
+                    <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80" alt="Community Events">
                     <div class="frame-title">Active Community</div>
                 </div>
             </div>
@@ -681,56 +678,9 @@
                         <th>Balance</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="leaderboardBody">
                     <tr>
-                        <td class="rank-number rank-1">#1</td>
-                        <td>
-                            <div class="player-info">
-                                <div class="player-avatar" style="background: linear-gradient(135deg, #ffd700, #ff8c00);"></div>
-                                <span>ShadowKing99</span>
-                            </div>
-                        </td>
-                        <td style="color: #00d2ff; font-weight: 600;">$48,500,000</td>
-                    </tr>
-                    <tr>
-                        <td class="rank-number rank-2">#2</td>
-                        <td>
-                            <div class="player-info">
-                                <div class="player-avatar" style="background: linear-gradient(135deg, #c0c0c0, #708090);"></div>
-                                <span>VortexPvP</span>
-                            </div>
-                        </td>
-                        <td style="color: #00d2ff; font-weight: 600;">$35,200,000</td>
-                    </tr>
-                    <tr>
-                        <td class="rank-number rank-3">#3</td>
-                        <td>
-                            <div class="player-info">
-                                <div class="player-avatar" style="background: linear-gradient(135deg, #cd7f32, #8b4513);"></div>
-                                <span>BlazeRunner</span>
-                            </div>
-                        </td>
-                        <td style="color: #00d2ff; font-weight: 600;">$29,100,000</td>
-                    </tr>
-                    <tr>
-                        <td class="rank-number">#4</td>
-                        <td>
-                            <div class="player-info">
-                                <div class="player-avatar"></div>
-                                <span>PixelBuilder</span>
-                            </div>
-                        </td>
-                        <td style="color: #00d2ff; font-weight: 600;">$18,450,000</td>
-                    </tr>
-                    <tr>
-                        <td class="rank-number">#5</td>
-                        <td>
-                            <div class="player-info">
-                                <div class="player-avatar"></div>
-                                <span>CryptoMiner</span>
-                            </div>
-                        </td>
-                        <td style="color: #00d2ff; font-weight: 600;">$12,900,000</td>
+                        <td colspan="3" style="text-align: center; color: #b0b3b8;">Loading live stats from server...</td>
                     </tr>
                 </tbody>
             </table>
@@ -824,7 +774,10 @@
             });
         }
 
-        window.addEventListener('DOMContentLoaded', updateNavAuthUI);
+        window.addEventListener('DOMContentLoaded', () => {
+            updateNavAuthUI();
+            fetchLeaderboard();
+        });
 
         function copyIP() {
             navigator.clipboard.writeText("play.donutsmp.net");
@@ -926,6 +879,49 @@
             localStorage.removeItem('is_logged_in');
             alert("Logged out successfully.");
             updateNavAuthUI();
+        }
+
+        // Fetch Live Leaderboard API
+        async function fetchLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+            
+            try {
+                // Replace with your actual server API endpoint
+                const response = await fetch('http://play.donutsmp.net:8804/api/v1/players');
+                const players = await response.json();
+                
+                players.sort((a, b) => b.money - a.money);
+                const topPlayers = players.slice(0, 5);
+                
+                tbody.innerHTML = '';
+
+                topPlayers.forEach((player, index) => {
+                    const rank = index + 1;
+                    let rankClass = "rank-number";
+                    if (rank === 1) rankClass += " rank-1";
+                    else if (rank === 2) rankClass += " rank-2";
+                    else if (rank === 3) rankClass += " rank-3";
+
+                    const row = `
+                        <tr>
+                            <td class="${rankClass}">#${rank}</td>
+                            <td>
+                                <div class="player-info">
+                                    <img src="https://crafthead.net/avatar/${player.name}/32" class="player-avatar" alt="${player.name}">
+                                    <span>${player.name}</span>
+                                </div>
+                            </td>
+                            <td style="color: #00d2ff; font-weight: 600;">$${Number(player.money || 0).toLocaleString()}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Failed to load live leaderboard:", error);
+                tbody.innerHTML = `
+                    <tr><td colspan="3" style="text-align: center; color: #ff4b4b;">Server offline or API unreachable.</td></tr>
+                `;
+            }
         }
     </script>
 </body>
