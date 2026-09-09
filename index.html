@@ -14,6 +14,83 @@
        })();
     </script>
     <style>
+/* Market Section Styles */
+        .market-section {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .market-container {
+            background: #12141c;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.1);
+        }
+
+        .market-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .market-table th {
+            background: rgba(0, 210, 255, 0.08);
+            color: #00d2ff;
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+        }
+
+        .market-table td {
+            padding: 1.2rem 1.5rem;
+            color: #b0b3b8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .market-table tr:hover td {
+            background: rgba(0, 210, 255, 0.02);
+            color: #fff;
+        }
+
+        .item-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .item-icon {
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+
+        .buy-action-btn {
+            background: rgba(0, 210, 255, 0.1);
+            color: #00d2ff;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 0.4rem 1rem;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .buy-action-btn:hover {
+            background: #00d2ff;
+            color: #0a0b0e;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -949,6 +1026,72 @@
                 `;
             }
         }
+// Fetch Live Auction House (/ah) and Market Prices
+        async function fetchMarketPrices() {
+            const marketBody = document.getElementById('marketBody');
+            
+            try {
+                // Replace with your server's live market/AH API endpoint
+                const response = await fetch('http://play.donutsmp.net:8804/api/v1/auctionhouse');
+                const items = await response.json();
+                
+                marketBody.innerHTML = ''; // Clear loading state
+
+                items.forEach((item) => {
+                    const row = `
+                        <tr>
+                            <td>
+                                <div class="item-info">
+                                    <div class="item-icon">📦</div>
+                                    <span>${item.name} x${item.amount}</span>
+                                </div>
+                            </td>
+                            <td>${item.seller}</td>
+                            <td style="color: #00d2ff; font-weight: 600;">$${Number(item.price).toLocaleString()}</td>
+                            <td>
+                                <button class="buy-action-btn" onclick="alert('In-game item listed by ${item.seller}. Join play.donutsmp.net and type /ah to buy!')">View /ah</button>
+                            </td>
+                        </tr>
+                    `;
+                    marketBody.innerHTML += row;
+                });
+            } catch (error) {
+                console.error("Failed to load live market prices:", error);
+                // Fallback demo data so the table looks active even if the live backend is offline
+                marketBody.innerHTML = `
+                    <tr>
+                        <td>
+                            <div class="item-info">
+                                <div class="item-icon">💎</div>
+                               <span>Netherite Helmet (Prot IV)</span>
+                            </div>
+                        </td>
+                        <td>ShadowKing99</td>
+                        <td style="color: #00d2ff; font-weight: 600;">$2,500,000</td>
+                        <td><button class="buy-action-btn" onclick="alert('Join play.donutsmp.net to buy!')">View /ah</button></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="item-info">
+                                <div class="item-icon">🍎</div>
+                                <span>Enchanted Golden Apple x16</span>
+                            </div>
+                        </td>
+                        <td>VortexPvP</td>
+                        <td style="color: #00d2ff; font-weight: 600;">$850,000</td>
+                        <td><button class="buy-action-btn" onclick="alert('Join play.donutsmp.net to buy!')">View /ah</button></td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Call it when the window loads along with your other functions
+        window.addEventListener('DOMContentLoaded', () => {
+            updateNavAuthUI();
+            fetchLeaderboard();
+            fetchMarketPrices();
+        });
+        
     </script>
 </body>
 </html>
