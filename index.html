@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DonutSMP - Leaderboard</title>
+    <!-- Include EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+       (function(){
+          emailjs.init({
+            publicKey: "6nX2OpETsEkUp1osF"
+          });
+       })();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0a0b0e;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Navbar Styling */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(18, 20, 28, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 210, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            width: 100%;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .nav-logo span {
+            color: #00d2ff;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #b0b3b8;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #00d2ff;
+            text-shadow: 0 0 8px rgba(0, 210, 255, 0.4);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .auth-btn {
+            background: linear-gradient(135deg, #0077ff, #00d2ff);
+            color: #ffffff;
+            border: none;
+            padding: 0.6rem 1.4rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(0, 119, 255, 0.4);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 18px rgba(0, 210, 255, 0.7);
+        }
+
+        .logout-btn {
+            background: rgba(255, 75, 75, 0.1);
+            color: #ff4b4b;
+            border: 1px solid rgba(255, 75, 75, 0.3);
+            padding: 0.6rem 1.2rem;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 75, 75, 0.2);
+            box-shadow: 0 0 12px rgba(255, 75, 75, 0.4);
+        }
+
+        .menu-toggle {
+            display: none;
+            cursor: pointer;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #fff;
+            border-radius: 2px;
+            transition: 0.3s;
+        }
+
+        /* Hero Section with Local Framed Gallery */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8rem 2rem 4rem 2rem;
+            background: radial-gradient(circle at center, rgba(0, 210, 255, 0.05) 0%, transparent 70%);
+        }
+
+        .hero-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(0, 210, 255, 0.1);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #00d2ff;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 10px rgba(0, 210, 255, 0.15);
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            color: #ffffff;
+        }
+
+        .hero-title span {
+            color: #00d2ff;
+            text-shadow: 0 0 20px rgba(0, 210, 255, 0.5);
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: #b0b3b8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #0077ff, #00d2ff);
+            color: #ffffff;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(0, 119, 255, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.7);
+        }
+
+        .secondary-btn {
+            background: rgba(18, 20, 28, 0.8);
+            color: #ffffff;
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            padding: 0.8rem 1.8rem;
+            font-weight: 600;
+            font-size: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .secondary-btn:hover {
+            border-color: #00d2ff;
+            background: rgba(0, 210, 255, 0.05);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.2);
+        }
+
+        /* Nicely Framed Gallery Grid using local files */
+        .hero-gallery {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .frame-card {
+            background: #12141c;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .frame-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d2ff;
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.3);
+        }
+
+        .frame-card img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .frame-title {
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #fff;
+            text-align: center;
+            background: rgba(18, 20, 28, 0.95);
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header h2 span {
+            color: #00d2ff;
+        }
+
+        .section-header p {
+            color: #b0b3b8;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #12141c;
+            border: 1px solid rgba(0, 210, 255, 0.15);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.05);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #00d2ff;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+            color: #fff;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: #b0b3b8;
+            line-height: 1.5;
+        }
+
+        /* Leaderboard Section */
+        .leaderboard-section {
+            padding: 5rem 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .leaderboard-container {
+            background: #12141c;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.1);
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .leaderboard-table th {
+            background: rgba(0, 210, 255, 0.08);
+            color: #00d2ff;
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+            border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+        }
+
+        .leaderboard-table td {
+            padding: 1.2rem 1.5rem;
+            color: #b0b3b8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .leaderboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard-table tr:hover td {
+            background: rgba(0, 210, 255, 0.02);
+            color: #fff;
+        }
+
+        .rank-number {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .rank-1 { color: #ffd700 !important; text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+        .rank-2 { color: #c0c0c0 !important; text-shadow: 0 0 10px rgba(192, 192, 192, 0.4); }
+        .rank-3 { color: #cd7f32 !important; text-shadow: 0 0 10px rgba(205, 127, 50, 0.4); }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .player-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            background: #00d2ff;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 11, 14, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: #12141c;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            padding: 2.5rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.15);
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #b0b3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .modal-close:hover {
+            color: #00d2ff;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            text-align: center;
+        }
+
+        .modal-title span {
+            color: #00d2ff;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #b0b3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: #0a0b0e;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #00d2ff;
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
+        }
+
+        .modal-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #0077ff, #00d2ff);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(0, 119, 255, 0.4);
+            margin-top: 0.5rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 18px rgba(0, 210, 255, 0.7);
+        }
+
+        .switch-text {
+            text-align: center;
+            margin-top: 1.2rem;
+            font-size: 0.85rem;
+            color: #b0b3b8;
+        }
+
+        .switch-text a {
+            color: #00d2ff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .switch-text a:hover {
+            text-decoration: underline;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .hero-container {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-content {
+                margin: 0 auto;
+            }
+            .hero-buttons {
+                justify-content: center;
+            }
+            .hero-gallery {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-right {
+                gap: 1rem;
+            }
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                width: 100%;
+                background: rgba(18, 20, 28, 0.95);
+                backdrop-filter: blur(15px);
+                padding: 1.5rem;
+                border-bottom: 1px solid rgba(0, 210, 255, 0.2);
+                text-align: center;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .menu-toggle {
+                display: flex;
+            }
+            .hero-title {
+                font-size: 2.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">Donut<span>SMP</span></a>
+
+            <div class="nav-right">
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#home" class="active">Home</a></li>
+                    <li><a href="#store">Store</a></li>
+                    <li><a href="#leaderboard">Leaderboard</a></li>
+                    <li><a href="#vote">Vote</a></li>
+                    <li><a href="#rules">Rules</a></li>
+                </ul>
+
+                <div class="nav-actions" id="navActions">
+                    <!-- Dynamically controlled by JS -->
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section with Local Framed Gallery -->
+    <section class="hero" id="home">
+        <div class="hero-container">
+            <div class="hero-content">
+                <div class="hero-badge">🔥 Season 3 Now Live!</div>
+                <h1 class="hero-title">Experience Ultimate Survival on <span>DonutSMP</span></h1>
+                <p class="hero-desc">Join thousands of players in a custom economy, thrilling raiding mechanics, custom enchants, and an active community. Claim your land and build your empire today.</p>
+                <div class="hero-buttons">
+                    <button class="primary-btn" onclick="copyIP()">Copy Server IP</button>
+                    <button class="secondary-btn" onclick="location.href='#store'">Visit Store</button>
+                </div>
+            </div>
+
+            <!-- Nicely Framed Gallery using local files (1.jpg, 2.jpg, etc.) -->
+            <div class="hero-gallery">
+                <div class="frame-card">
+                    <img src="images/1.jpg" alt="Custom Survival">
+                    <div class="frame-title">Custom Survival</div>
+                </div>
+                <div class="frame-card">
+                    <img src="images/2.jpg" alt="PvP Battles">
+                    <div class="frame-title">Intense PvP Arena</div>
+                </div>
+                <div class="frame-card">
+                    <img src="images/3.jpg" alt="Economy & Ranks">
+                    <div class="frame-title">Player Economy</div>
+                </div>
+                <div class="frame-card">
+                    <img src="images/4.jpg" alt="Community Events">
+                    <div class="frame-title">Active Community</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2>Why Play on <span>DonutSMP</span>?</h2>
+            <p>Everything you need to know about our custom game features</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🛡️</div>
+                <h3>Advanced Land Claiming</h3>
+                <p>Protect your builds, items, and hard-earned resources from griefers with our easy-to-use claims system.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚔️</div>
+                <h3>Custom Enchants & Gear</h3>
+                <p>Discover unique weapons, armor sets, and powerful custom enchantments to dominate every battle.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">💰</div>
+                <h3>Player-Driven Economy</h3>
+                <p>Build player shops, trade rare items, use auction houses, and rise to the top of the wealth leaderboards.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Section -->
+    <section class="leaderboard-section" id="leaderboard">
+        <div class="section-header">
+            <h2>Top <span>Leaderboard</span></h2>
+            <p>The wealthiest players ruling the DonutSMP economy</p>
+        </div>
+        <div class="leaderboard-container">
+            <table class="leaderboard-table">
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Player</th>
+                        <th>Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="rank-number rank-1">#1</td>
+                        <td>
+                            <div class="player-info">
+                                <div class="player-avatar" style="background: linear-gradient(135deg, #ffd700, #ff8c00);"></div>
+                                <span>ShadowKing99</span>
+                            </div>
+                        </td>
+                        <td style="color: #00d2ff; font-weight: 600;">$48,500,000</td>
+                    </tr>
+                    <tr>
+                        <td class="rank-number rank-2">#2</td>
+                        <td>
+                            <div class="player-info">
+                                <div class="player-avatar" style="background: linear-gradient(135deg, #c0c0c0, #708090);"></div>
+                                <span>VortexPvP</span>
+                            </div>
+                        </td>
+                        <td style="color: #00d2ff; font-weight: 600;">$35,200,000</td>
+                    </tr>
+                    <tr>
+                        <td class="rank-number rank-3">#3</td>
+                        <td>
+                            <div class="player-info">
+                                <div class="player-avatar" style="background: linear-gradient(135deg, #cd7f32, #8b4513);"></div>
+                                <span>BlazeRunner</span>
+                            </div>
+                        </td>
+                        <td style="color: #00d2ff; font-weight: 600;">$29,100,000</td>
+                    </tr>
+                    <tr>
+                        <td class="rank-number">#4</td>
+                        <td>
+                            <div class="player-info">
+                                <div class="player-avatar"></div>
+                                <span>PixelBuilder</span>
+                            </div>
+                        </td>
+                        <td style="color: #00d2ff; font-weight: 600;">$18,450,000</td>
+                    </tr>
+                    <tr>
+                        <td class="rank-number">#5</td>
+                        <td>
+                            <div class="player-info">
+                                <div class="player-avatar"></div>
+                                <span>CryptoMiner</span>
+                            </div>
+                        </td>
+                        <td style="color: #00d2ff; font-weight: 600;">$12,900,000</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="modal-box">
+            <button class="modal-close" id="closeModal">&times;</button>
+            
+            <div id="loginSection">
+                <h2 class="modal-title">Welcome <span>Back</span></h2>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="loginEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPass" required placeholder="Enter your passcode">
+                    </div>
+                    <button type="submit" class="modal-btn">Login</button>
+                </form>
+                <p class="switch-text">Don't have an account? <a onclick="switchForm('signup')">Sign Up</a></p>
+            </div>
+
+            <div id="signupSection" class="hidden">
+                <h2 class="modal-title">Create <span>Account</span></h2>
+                <form id="signupForm" onsubmit="handleSignup(event)">
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="signupEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Create Passcode</label>
+                        <input type="password" id="signupPass" required placeholder="Choose a secure passcode">
+                    </div>
+                    <button type="submit" class="modal-btn" id="sendCodeBtn">Send Verification Code</button>
+                </form>
+                <p class="switch-text">Already have an account? <a onclick="switchForm('login')">Login</a></p>
+            </div>
+
+            <div id="verifySection" class="hidden">
+                <h2 class="modal-title">Verify <span>Email</span></h2>
+                <p style="font-size: 0.85rem; color: #b0b3b8; margin-bottom: 1rem; text-align: center;">
+                    We've sent a code to your email. Check your inbox!
+                </p>
+                <form id="verifyForm" onsubmit="handleVerify(event)">
+                    <div class="form-group">
+                        <label>Verification Code</label>
+                        <input type="text" id="verifyCodeInput" required placeholder="Enter code">
+                    </div>
+                    <button type="submit" class="modal-btn">Verify & Create Account</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function updateNavAuthUI() {
+            const navActions = document.getElementById('navActions');
+            const isLoggedIn = localStorage.getItem('is_logged_in') === 'true';
+            const userEmail = localStorage.getItem('user_email') || 'Account';
+
+            if (isLoggedIn) {
+                navActions.innerHTML = `
+                    <button class="auth-btn" onclick="alert('Logged in as: ${userEmail}')">${userEmail}</button>
+                    <button class="logout-btn" onclick="handleLogout()">Logout</button>
+                    <div class="menu-toggle" id="mobile-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+            } else {
+                navActions.innerHTML = `
+                    <button class="auth-btn" id="openAuthModal">Login / Sign Up</button>
+                    <div class="menu-toggle" id="mobile-menu">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                `;
+                document.getElementById('openAuthModal').addEventListener('click', () => modal.classList.add('active'));
+            }
+
+            document.getElementById('mobile-menu').addEventListener('click', () => {
+                document.getElementById('navLinks').classList.toggle('active');
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', updateNavAuthUI);
+
+        function copyIP() {
+            navigator.clipboard.writeText("play.donutsmp.net");
+            alert("Server IP Copied: play.donutsmp.net");
+        }
+
+        const modal = document.getElementById('authModal');
+        const closeBtn = document.getElementById('closeModal');
+
+        closeBtn.addEventListener('click', () => modal.classList.remove('active'));
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        function switchForm(formType) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('signupSection').classList.add('hidden');
+            document.getElementById('verifySection').classList.add('hidden');
+
+            if (formType === 'login') {
+                document.getElementById('loginSection').classList.remove('hidden');
+            } else if (formType === 'signup') {
+                document.getElementById('signupSection').classList.remove('hidden');
+            }
+        }
+
+        let generatedCode = "";
+        let userEmail = "";
+        let userPass = "";
+
+        function handleSignup(e) {
+            e.preventDefault();
+            userEmail = document.getElementById('signupEmail').value;
+            userPass = document.getElementById('signupPass').value;
+            
+            generatedCode = Math.floor(100000 + Math.random() * 900000).toString();
+            const btn = document.getElementById('sendCodeBtn');
+            btn.textContent = "Sending Email...";
+            btn.disabled = true;
+
+            const templateParams = {
+                to_email: userEmail,
+                code: generatedCode
+            };
+
+            emailjs.send('service_gp638i3', 'template_3rzmwec', templateParams)
+                .then(function(response) {
+                    btn.textContent = "Send Verification Code";
+                    btn.disabled = false;
+                    document.getElementById('signupSection').classList.add('hidden');
+                    document.getElementById('verifySection').classList.remove('hidden');
+                    alert("Verification email sent to " + userEmail + "!");
+                }, function(error) {
+                    btn.textContent = "Send Verification Code";
+                    btn.disabled = false;
+                    console.log('FAILED...', error);
+                    alert("Email failed to send. Check your EmailJS configuration.");
+                });
+        }
+
+        function handleVerify(e) {
+            e.preventDefault();
+            const inputCode = document.getElementById('verifyCodeInput').value;
+            
+            if (inputCode === generatedCode) {
+                localStorage.setItem('user_email', userEmail);
+                localStorage.setItem('user_pass', userPass);
+                localStorage.setItem('is_logged_in', 'true');
+                alert("Email verified successfully! Account created and logged in.");
+                modal.classList.remove('active');
+                switchForm('login');
+                updateNavAuthUI();
+            } else {
+                alert("Incorrect verification code. Please check your email inbox.");
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('loginEmail').value;
+            const passInput = document.getElementById('loginPass').value;
+            
+            const savedEmail = localStorage.getItem('user_email');
+            const savedPass = localStorage.getItem('user_pass');
+
+            if (savedEmail && emailInput === savedEmail && passInput === savedPass) {
+                localStorage.setItem('is_logged_in', 'true');
+                alert("Logged in successfully!");
+                modal.classList.remove('active');
+                updateNavAuthUI();
+            } else if (!savedEmail) {
+                alert("No account found! Please sign up first.");
+            } else {
+                alert("Invalid email or passcode.");
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('is_logged_in');
+            alert("Logged out successfully.");
+            updateNavAuthUI();
+        }
+    </script>
+</body>
+</html>
